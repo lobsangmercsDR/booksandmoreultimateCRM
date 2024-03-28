@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Drawer from '@mui/material/Drawer';
 import List from '@mui/material/List';
@@ -11,13 +11,56 @@ import PersonIcon from '@mui/icons-material/Person';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import { Switch } from '@mui/material';
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
+import Collapse from '@mui/material/Collapse';
+import VolunteerActivismIcon from '@mui/icons-material/VolunteerActivism';
+import { useDarkmode } from '../../context/DarkmodeContext';
+import { Link as RouterLink } from 'react-router-dom';
 
 function SideBar() {
-  const [darkMode, setDarkMode] = useState(false);
+  const { darkMode, toggleDarkMode } = useDarkmode();
+  const [open, setOpen] = useState({});
 
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
+  const handleClick = (itemName) => {
+    setOpen({ ...open, [itemName]: !open[itemName] });
   };
+
+  const menuItems = [
+    {
+      title: 'Home',
+      path: '/home', // Asegúrate de que esta ruta esté definida en tus Routes
+      icon: <HomeIcon />
+    },
+    {
+      title: "Libros",
+      icon: <BookIcon />,
+      subItems: [
+        { title: "Ver todos los libros" },
+        { title: "Agregar Libro" },
+        { title: "Categorias" },
+        { title: "Agregar Categoria" },
+      ]
+    },
+    {
+      title: "Usuarios",
+      icon: <PersonIcon />,
+      subItems: [
+        { title: "Todos los Usuarios" },
+        { title: "Agregar usuario" },
+      ]
+    },
+    {
+      title: "Donaciones de libros",
+      icon: <VolunteerActivismIcon />,
+      subItems: [
+        { title: "Historial de donaciones" },
+        { title: "Donaciones pendientes" },
+        { title: "Donaciones aceptadas" },
+        { title: "Donaciones rechazadas" },
+      ]
+    }
+  ];
 
   const theme = createTheme({
     palette: {
@@ -39,24 +82,35 @@ function SideBar() {
         }}
       >
         <List>
-          <ListItem button>
-            <ListItemIcon>
-              <HomeIcon />
-            </ListItemIcon>
-            <ListItemText primary="Home" />
-          </ListItem>
-          <ListItem button>
-            <ListItemIcon>
-              <BookIcon />
-            </ListItemIcon>
-            <ListItemText primary="Books" />
-          </ListItem>
-          <ListItem button>
-            <ListItemIcon>
-              <PersonIcon />
-            </ListItemIcon>
-            <ListItemText primary="Profile" />
-          </ListItem>
+          {menuItems.map(({ title, icon, subItems, path }) => (
+            <React.Fragment key={title}>
+              {!subItems ? (
+                <RouterLink to={path} style={{ textDecoration: 'none', color: 'inherit' }}>
+                  <ListItem button>
+                    <ListItemIcon>{icon}</ListItemIcon>
+                    <ListItemText primary={title} />
+                  </ListItem>
+                </RouterLink>
+              ) : (
+                <>
+                  <ListItem button onClick={() => handleClick(title)}>
+                    <ListItemIcon>{icon}</ListItemIcon>
+                    <ListItemText primary={title} />
+                    {open[title] ? <ExpandLess /> : <ExpandMore />}
+                  </ListItem>
+                  <Collapse in={open[title]} timeout="auto" unmountOnExit>
+                    <List component="div" disablePadding>
+                      {subItems.map((subItem) => (
+                        <ListItem button key={subItem.title} sx={{ pl: 4 }}>
+                          <ListItemText primary={subItem.title} />
+                        </ListItem>
+                      ))}
+                    </List>
+                  </Collapse>
+                </>
+              )}
+            </React.Fragment>
+          ))}
         </List>
 
         <div style={{ position: 'absolute', bottom: 10, left: 10 }}>
