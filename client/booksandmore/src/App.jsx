@@ -2,7 +2,8 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import AppBarr from './components/Layout/AppBar'
 import SideBar from './components/Layout/SideBar';
 import { DarkmodeProvider } from './context/DarkmodeContext';
-import HomePage from './components/HomePage';
+
+import HomePage from './components/Layout/HomePage';
 
 export default function App() {
   return (

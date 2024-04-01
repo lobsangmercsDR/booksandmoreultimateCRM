@@ -1,9 +1,19 @@
 // En HomePage.jsx
 
+
+import SalesAndOrdersSummaryWidget from '../Widgets/SalesSummaryWidget';
+import SalesChartWidget from '../Widgets/SalesChartWidget';
 import Grid from '@mui/material/Grid';
-import SalesChartWidget from './Widgets/SalesChartWidget';
-import SalesAndOrdersSummaryWidget from './Widgets/SalesSummaryWidget';
+
+
+
+
+
 // Importa otros widgets aquí
+
+
+
+
 const salesData = [1200, 1900, 750, 2500];
 
 // Datos de prueba para books
@@ -15,9 +25,33 @@ const books = [
 
 // Datos de prueba para orders
 const orders = [
-  { id: 'ORD02201', date: '2024-03-25', status: 'Pendiente' },
-  { id: 'ORD002', date: '2024-03-26', status: 'Pendiente' },
-  { id: 'ORD003', date: '2024-03-27', status: 'Pendiente' },
+  {
+    id: 'ORD02201',
+    date: '2024-03-25',
+    status: 'Pendiente',
+    customerName: 'John Doe',
+    booksOrdered: ['El principito', 'Cien años de soledad'],
+    shippingCost: 5.99,
+    paymentMethod: 'Credit Card'
+  },
+  {
+    id: 'ORD002',
+    date: '2024-03-26',
+    status: 'Pendiente',
+    customerName: 'Jane Smith',
+    booksOrdered: ['1984'],
+    shippingCost: 3.99,
+    paymentMethod: 'PayPal'
+  },
+  {
+    id: 'ORD003',
+    date: '2024-03-27',
+    status: 'Pendiente',
+    customerName: 'Bob Johnson',
+    booksOrdered: ['El principito', '1984'],
+    shippingCost: 7.99,
+    paymentMethod: 'Credit Card'
+  },
 ];
 
 const HomePage = () => {
@@ -38,3 +72,4 @@ const HomePage = () => {
 }
 
 export default HomePage;
+

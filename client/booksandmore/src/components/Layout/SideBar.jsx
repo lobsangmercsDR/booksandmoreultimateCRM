@@ -17,6 +17,8 @@ import Collapse from '@mui/material/Collapse';
 import VolunteerActivismIcon from '@mui/icons-material/VolunteerActivism';
 import { useDarkmode } from '../../context/DarkmodeContext';
 import { Link as RouterLink } from 'react-router-dom';
+import TwoWheelerIcon from '@mui/icons-material/TwoWheeler';
+import ConfirmationNumberIcon from '@mui/icons-material/ConfirmationNumber';
 
 function SideBar() {
   const { darkMode, toggleDarkMode } = useDarkmode();
@@ -33,7 +35,7 @@ function SideBar() {
       icon: <HomeIcon />
     },
     {
-      title: "Libros",
+      title: "Libros y Categorias",
       icon: <BookIcon />,
       subItems: [
         { title: "Ver todos los libros" },
@@ -58,6 +60,32 @@ function SideBar() {
         { title: "Donaciones pendientes" },
         { title: "Donaciones aceptadas" },
         { title: "Donaciones rechazadas" },
+      ]
+    },
+    {
+      title: "Ordenes",
+      icon: <TwoWheelerIcon />,
+      subItems: [
+        { title: "Todas las Ordenes" },
+        { title: "Ordenes pendientes" },
+        { title: "Ordenes en proceso"},
+        { title: "Ordenes completadas" },
+        { title: "Ordenes canceladas" },
+
+        {title: "Agregar Orden Perzonalizada"}
+
+      ]
+    },
+    {
+      title: "Cupones",
+      icon: <ConfirmationNumberIcon />,
+      subItems: [
+        { title: "Todos los cupones" },
+        { title: "Agregar cupon" },
+        { title: "Cupones activos" },
+        { title: "Cupones inactivos" },
+
+
       ]
     }
   ];
