@@ -10,13 +10,13 @@ import BookIcon from '@mui/icons-material/Book';
 import PersonIcon from '@mui/icons-material/Person';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
-import { Switch } from '@mui/material';
+import { ListItemButton, Switch } from '@mui/material';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import Collapse from '@mui/material/Collapse';
 import VolunteerActivismIcon from '@mui/icons-material/VolunteerActivism';
 import { useDarkmode } from '../../context/DarkmodeContext';
-import { Link as RouterLink } from 'react-router-dom';
+import {Link} from 'react-router-dom';
 import TwoWheelerIcon from '@mui/icons-material/TwoWheeler';
 import ConfirmationNumberIcon from '@mui/icons-material/ConfirmationNumber';
 
@@ -38,7 +38,7 @@ function SideBar() {
       title: "Libros y Categorias",
       icon: <BookIcon />,
       subItems: [
-        { title: "Ver todos los libros" },
+        { title: "Ver todos los libros", path: "/allbooks" },
         { title: "Agregar Libro" },
         { title: "Categorias" },
         { title: "Agregar Categoria" },
@@ -68,11 +68,11 @@ function SideBar() {
       subItems: [
         { title: "Todas las Ordenes" },
         { title: "Ordenes pendientes" },
-        { title: "Ordenes en proceso"},
+        { title: "Ordenes en proceso" },
         { title: "Ordenes completadas" },
         { title: "Ordenes canceladas" },
 
-        {title: "Agregar Orden Perzonalizada"}
+        { title: "Agregar Orden Perzonalizada" }
 
       ]
     },
@@ -95,7 +95,6 @@ function SideBar() {
       mode: darkMode ? 'dark' : 'light',
     },
   });
-
   return (
     <ThemeProvider theme={theme}>
       <Drawer
@@ -113,25 +112,29 @@ function SideBar() {
           {menuItems.map(({ title, icon, subItems, path }) => (
             <React.Fragment key={title}>
               {!subItems ? (
-                <RouterLink to={path} style={{ textDecoration: 'none', color: 'inherit' }}>
-                  <ListItem button>
-                    <ListItemIcon>{icon}</ListItemIcon>
-                    <ListItemText primary={title} />
-                  </ListItem>
-                </RouterLink>
+                <ListItemButton component={Link} to={path} style={{ textDecoration: 'none', color: 'inherit' }}>
+                  <ListItemIcon>{icon}</ListItemIcon>
+                  <ListItemText primary={title} />
+                </ListItemButton>
               ) : (
                 <>
-                  <ListItem button onClick={() => handleClick(title)}>
+                  <ListItemButton onClick={() => handleClick(title)}>
                     <ListItemIcon>{icon}</ListItemIcon>
                     <ListItemText primary={title} />
                     {open[title] ? <ExpandLess /> : <ExpandMore />}
-                  </ListItem>
+                  </ListItemButton>
                   <Collapse in={open[title]} timeout="auto" unmountOnExit>
                     <List component="div" disablePadding>
                       {subItems.map((subItem) => (
-                        <ListItem button key={subItem.title} sx={{ pl: 4 }}>
+                        <ListItemButton
+                          key={subItem.title}
+                          sx={{ pl: 4 }}
+                          component={subItem.path ? Link : "button"}
+                          to={subItem.path ? subItem.path : ""}
+                          style={{ textDecoration: 'none', color: 'inherit' }}
+                        >
                           <ListItemText primary={subItem.title} />
-                        </ListItem>
+                        </ListItemButton>
                       ))}
                     </List>
                   </Collapse>
@@ -142,18 +145,19 @@ function SideBar() {
         </List>
 
         <div style={{ position: 'absolute', bottom: 10, left: 10 }}>
-          <ListItemIcon>
+          <ListItemIcon onClick={toggleDarkMode}>
             {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
           </ListItemIcon>
           <Switch
             checked={darkMode}
             onChange={toggleDarkMode}
-            inputProps={{ 'aria-label': 'toggle dark mode' }}
+            inputProps={{ 'aria-label': 'control de modo oscuro' }}
           />
         </div>
       </Drawer>
     </ThemeProvider>
   );
 }
+
 
 export default SideBar;
