@@ -39,9 +39,8 @@ function SideBar() {
       icon: <BookIcon />,
       subItems: [
         { title: "Ver todos los libros", path: "/allbooks" },
-        { title: "Agregar Libro" },
-        { title: "Categorias" },
-        { title: "Agregar Categoria" },
+        { title: "Agregar Libro", path: "/uploadbook"},
+
       ]
     },
     {

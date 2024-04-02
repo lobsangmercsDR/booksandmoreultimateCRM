@@ -27,7 +27,7 @@ function AppWrapper() {
   });
 
   const appStyles = {
-    backgroundColor: theme.palette.mode === 'dark' ? '#121212' : '#f5f5f5',
+    backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#f5f5f5',
     color: theme.palette.mode === 'dark' ? '#fff' : '#000',
 
   };

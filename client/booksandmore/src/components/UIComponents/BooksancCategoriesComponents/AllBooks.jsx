@@ -68,6 +68,8 @@ function AllBooks() {
   const [open, setOpen] = useState(false);
   const [selectedBook, setSelectedBook] = useState(null);
   const [imageToView, setImageToView] = useState('');
+  const [filterStock, setFilterStock] = useState('');
+  const [filterCondition, setFilterCondition] = useState('');
 
   const handleImageClick = (imageUrl) => {
     setImageToView(imageUrl);
@@ -80,7 +82,9 @@ function AllBooks() {
     const filteredBooks = simulatedBooks.filter((book) =>
       (filter ? book.name.toLowerCase().includes(filter) || book.description.toLowerCase().includes(filter) : true) &&
       (filterAuthor ? book.author.includes(filterAuthor) : true) &&
-      (filterCategory ? book.categories.includes(filterCategory) : true)
+      (filterCategory ? book.categories.includes(filterCategory) : true) &&
+      (filterStock ? (filterStock === 'more' ? book.stock > 5 : book.stock <= 5) : true) &&
+      (filterCondition ? book.condition === filterCondition : true)
     );
     setBooks(filteredBooks);
   };
@@ -126,7 +130,11 @@ function AllBooks() {
           setFilterCategory={setFilterCategory}
           applyFilters={applyFilters}
           authors={authors} // Asegúrate de definir y pasar este array
-          categories={categories} // Asegúrate de definir y pasar este array
+          categories={categories}
+          filterStock={filterStock}
+          setFilterStock={setFilterStock}
+          filterCondition={filterCondition}
+          setFilterCondition={setFilterCondition}
           />
 
         <TableContainer component={Paper}>
