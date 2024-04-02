@@ -27,6 +27,11 @@ import {
 import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 
+import { useDarkmode } from '../../../context/DarkmodeContext';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
+import AdminBookFilters from '../../Widgets/AdminBooksFiltrer';
+
 const simulatedBooks = [
   { "id": 1, "name": "One Hundred Years of Solitude", "author": "Gabriel García Márquez", "categories": "Novel, Magical Realism", "description": "A family saga that spans seven generations in the fictional city of Macondo.", "price": "20.00", "condition": "new", "stock": 5, "imageUrl": "https://covers.openlibrary.org/b/id/8121781-L.jpg" },
   { "id": 2, "name": "Don Quixote", "author": "Miguel de Cervantes", "categories": "Novel, Classic Fiction", "description": "The adventures of a nobleman who goes mad and believes he is a knight-errant.", "price": "25.00", "condition": "used", "stock": 3, "imageUrl": "https://covers.openlibrary.org/b/id/7984916-L.jpg" },
@@ -41,7 +46,21 @@ const simulatedBooks = [
   { "id": 11, "name": "The Catcher in the Rye", "author": "J.D. Salinger", "categories": "Novel, Classic Fiction", "description": "The story of a few days in the life of Holden Caulfield, a disillusioned young man.", "price": "18.50", "condition": "new", "stock": 4, "imageUrl": "https://covers.openlibrary.org/b/id/8251320-L.jpg" },
 ];
 
+
+
+
+
 function AllBooks() {
+
+  const { darkMode } = useDarkmode(); // Ahora se puede utilizar useDarkmode
+  const theme = createTheme({
+    palette: {
+      mode: darkMode ? 'dark' : 'light',
+    },
+  });
+
+
+
   const [filter, setFilter] = useState('');
   const [filterAuthor, setFilterAuthor] = useState('');
   const [filterCategory, setFilterCategory] = useState('');
@@ -92,203 +111,180 @@ function AllBooks() {
     setSelectedBook({ ...selectedBook, categories: newCategories.join(', ') });
   };
 
-  return (
-    <div>
-      <TextField
-        id="search-bar"
-        label="Search book"
-        variant="outlined"
-        fullWidth
-        margin="normal"
-        onChange={(event) => setFilter(event.target.value.toLowerCase())}
-      />
-      <Box sx={{ display: 'flex', gap: 2, marginY: 2, alignItems: 'center' }}>
-        <FormControl fullWidth>
-          <InputLabel>Author</InputLabel>
-          <Select
-            value={filterAuthor}
-            label="Author"
-            onChange={(event) => setFilterAuthor(event.target.value)}
-          >
-            <MenuItem value="">All</MenuItem>
-            {authors.map(author => (
-              <MenuItem key={author} value={author}>{author}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <FormControl fullWidth>
-          <InputLabel>Category</InputLabel>
-          <Select
-            value={filterCategory}
-            label="Category"
-            onChange={(event) => setFilterCategory(event.target.value)}
-          >
-            <MenuItem value="">All</MenuItem>
-            {categories.map(category => (
-              <MenuItem key={category} value={category}>{category}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <Button variant="outlined" onClick={applyFilters}>Apply Filters</Button>
-      </Box>
-      <Box sx={{ marginBottom: 2 }}>
-        <b>Books on the platform: {books.length}</b>
-      </Box>
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="book table">
-          <TableHead>
-            <TableRow>
-              <TableCell >Image</TableCell>
-              <TableCell>Book Name</TableCell>
-              <TableCell align="right">Author</TableCell>
-              <TableCell align="right">Categories</TableCell>
-              <TableCell align="right">Price</TableCell>
-              <TableCell align="right">Condition</TableCell>
-              <TableCell align="right">Stock</TableCell>
-              <TableCell align="right">Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {books.map((book) => (
-              <TableRow key={book.id}>
-                <TableCell>
-                  <img
-                    src={book.imageUrl}
-                    alt={book.name}
-                    style={{ width: 50, height: 70 }}
-                    onClick={() => handleImageClick(book.imageUrl)}
-                  />
-                </TableCell>
-                <TableCell component="th" scope="row">{book.name}</TableCell>
-                <TableCell align="right">{book.author}</TableCell>
-                <TableCell align="right">{book.categories}</TableCell>
-                <TableCell align="right">${book.price}</TableCell>
-                <TableCell align="right">{book.condition}</TableCell>
-                <TableCell align="right">{book.stock}</TableCell>
-                <TableCell align="right">
-                  <IconButton aria-label="view" onClick={() => handleOpenDialog(book)}><VisibilityIcon /></IconButton>
-                  <IconButton aria-label="delete"><DeleteIcon /></IconButton>
-                  {/* Implementation of other buttons as needed */}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      {selectedBook && (
-        <Dialog open={open} onClose={handleCloseDialog} maxWidth="md" fullWidth>
-          <DialogTitle>Edit Book</DialogTitle>
-          <DialogContent>
-            <TextField
-              margin="dense"
-              id="name"
-              label="Book Name"
-              type="text"
-              fullWidth
-              variant="outlined"
-              value={selectedBook.name || ''}
-              onChange={(e) => updateBook('name', e.target.value)}
-              sx={{ marginBottom: 2 }}
-            />
-            <TextField
-              margin="dense"
-              id="author"
-              label="Author"
-              type="text"
-              fullWidth
-              variant="outlined"
-              value={selectedBook.author || ''}
-              onChange={(e) => updateBook('author', e.target.value)}
-              sx={{ marginBottom: 2 }}
-            />
-            <Paper style={{ padding: '20px', margin: '10px 0' }} variant="outlined">
-              <Grid container spacing={2}>
-                {categories.map((category) => (
-                  <Grid item xs={4} key={category}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={selectedBook.categories.split(', ').includes(category)}
-                          onChange={() => handleToggleCategory(category)}
-                        />
-                      }
-                      label={category}
-                    />
-                  </Grid>
-                ))}
-              </Grid>
-            </Paper>
 
-            <TextField
-              margin="dense"
-              id="description"
-              label="Description"
-              type="text"
-              fullWidth
-              multiline
-              rows={4}
-              variant="outlined"
-              value={selectedBook.description || ''}
-              onChange={(e) => updateBook('description', e.target.value)}
-              sx={{ marginBottom: 2 }}
-            />
-            <TextField
-              margin="dense"
-              id="price"
-              label="Price"
-              type="number"
-              fullWidth
-              variant="outlined"
-              value={selectedBook.price || ''}
-              onChange={(e) => updateBook('price', e.target.value)}
-              sx={{ marginBottom: 2 }}
-            />
-            <FormControl fullWidth sx={{ marginBottom: 2 }}>
-              <InputLabel id="condition-label">Condition</InputLabel>
-              <Select
-                labelId="condition-label"
-                id="condition"
-                value={selectedBook.condition || ''}
-                label="Condition"
-                onChange={(e) => updateBook('condition', e.target.value)}
-              >
-                <MenuItem value="new">New</MenuItem>
-                <MenuItem value="like new">Like New</MenuItem>
-                <MenuItem value="used">Used</MenuItem>
-                <MenuItem value="very used">Very Used</MenuItem>
-              </Select>
-            </FormControl>
-            <TextField
-              margin="dense"
-              id="stock"
-              label="Stock"
-              type="number"
-              fullWidth
-              variant="outlined"
-              value={selectedBook.stock || ''}
-              onChange={(e) => updateBook('stock', e.target.value)}
-              sx={{ marginBottom: 2 }}
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseDialog}>Cancel</Button>
-            <Button onClick={() => {
-              // Simulating book update
-              const updatedBooks = books.map(book =>
-                book.id === selectedBook.id ? selectedBook : book
-              );
-              setBooks(updatedBooks);
-              handleCloseDialog();
-            }}>Save</Button>
-          </DialogActions>
-        </Dialog>
-      )}
-      {imageToView && (
-        <Dialog open={Boolean(imageToView)} onClose={() => setImageToView('')}>
-          <img src={imageToView} alt="Full Screen" style={{ width: '100%' }} />
-        </Dialog>
-      )}
-    </div>
+
+
+  return (
+    <ThemeProvider theme={theme}>
+      <div>
+        <AdminBookFilters
+          filter={filter}
+          setFilter={setFilter}
+          filterAuthor={filterAuthor}
+          setFilterAuthor={setFilterAuthor}
+          filterCategory={filterCategory}
+          setFilterCategory={setFilterCategory}
+          applyFilters={applyFilters}
+          authors={authors} // Asegúrate de definir y pasar este array
+          categories={categories} // Asegúrate de definir y pasar este array
+          />
+
+        <TableContainer component={Paper}>
+          <Table sx={{ minWidth: 650 }} aria-label="book table">
+            <TableHead>
+              <TableRow>
+                <TableCell >Image</TableCell>
+                <TableCell>Book Name</TableCell>
+                <TableCell align="right">Author</TableCell>
+                <TableCell align="right">Categories</TableCell>
+                <TableCell align="right">Price</TableCell>
+                <TableCell align="right">Condition</TableCell>
+                <TableCell align="right">Stock</TableCell>
+                <TableCell align="right">Actions</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {books.map((book) => (
+                <TableRow key={book.id}>
+                  <TableCell>
+                    <img
+                      src={book.imageUrl}
+                      alt={book.name}
+                      style={{ width: 50, height: 70 }}
+                      onClick={() => handleImageClick(book.imageUrl)}
+                    />
+                  </TableCell>
+                  <TableCell component="th" scope="row">{book.name}</TableCell>
+                  <TableCell align="right">{book.author}</TableCell>
+                  <TableCell align="right">{book.categories}</TableCell>
+                  <TableCell align="right">${book.price}</TableCell>
+                  <TableCell align="right">{book.condition}</TableCell>
+                  <TableCell align="right">{book.stock}</TableCell>
+                  <TableCell align="right">
+                    <IconButton aria-label="view" onClick={() => handleOpenDialog(book)}><VisibilityIcon /></IconButton>
+                    <IconButton aria-label="delete"><DeleteIcon /></IconButton>
+                    {/* Implementation of other buttons as needed */}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        {selectedBook && (
+          <Dialog open={open} onClose={handleCloseDialog} maxWidth="md" fullWidth>
+            <DialogTitle>Edit Book</DialogTitle>
+            <DialogContent>
+              <TextField
+                margin="dense"
+                id="name"
+                label="Book Name"
+                type="text"
+                fullWidth
+                variant="outlined"
+                value={selectedBook.name || ''}
+                onChange={(e) => updateBook('name', e.target.value)}
+                sx={{ marginBottom: 2 }}
+              />
+              <TextField
+                margin="dense"
+                id="author"
+                label="Author"
+                type="text"
+                fullWidth
+                variant="outlined"
+                value={selectedBook.author || ''}
+                onChange={(e) => updateBook('author', e.target.value)}
+                sx={{ marginBottom: 2 }}
+              />
+              <Paper style={{ padding: '20px', margin: '10px 0' }} variant="outlined">
+                <Grid container spacing={2}>
+                  {categories.map((category) => (
+                    <Grid item xs={4} key={category}>
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={selectedBook.categories.split(', ').includes(category)}
+                            onChange={() => handleToggleCategory(category)}
+                          />
+                        }
+                        label={category}
+                      />
+                    </Grid>
+                  ))}
+                </Grid>
+              </Paper>
+
+              <TextField
+                margin="dense"
+                id="description"
+                label="Description"
+                type="text"
+                fullWidth
+                multiline
+                rows={4}
+                variant="outlined"
+                value={selectedBook.description || ''}
+                onChange={(e) => updateBook('description', e.target.value)}
+                sx={{ marginBottom: 2 }}
+              />
+              <TextField
+                margin="dense"
+                id="price"
+                label="Price"
+                type="number"
+                fullWidth
+                variant="outlined"
+                value={selectedBook.price || ''}
+                onChange={(e) => updateBook('price', e.target.value)}
+                sx={{ marginBottom: 2 }}
+              />
+              <FormControl fullWidth sx={{ marginBottom: 2 }}>
+                <InputLabel id="condition-label">Condition</InputLabel>
+                <Select
+                  labelId="condition-label"
+                  id="condition"
+                  value={selectedBook.condition || ''}
+                  label="Condition"
+                  onChange={(e) => updateBook('condition', e.target.value)}
+                >
+                  <MenuItem value="new">New</MenuItem>
+                  <MenuItem value="like new">Like New</MenuItem>
+                  <MenuItem value="used">Used</MenuItem>
+                  <MenuItem value="very used">Very Used</MenuItem>
+                </Select>
+              </FormControl>
+              <TextField
+                margin="dense"
+                id="stock"
+                label="Stock"
+                type="number"
+                fullWidth
+                variant="outlined"
+                value={selectedBook.stock || ''}
+                onChange={(e) => updateBook('stock', e.target.value)}
+                sx={{ marginBottom: 2 }}
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleCloseDialog}>Cancel</Button>
+              <Button onClick={() => {
+                // Simulating book update
+                const updatedBooks = books.map(book =>
+                  book.id === selectedBook.id ? selectedBook : book
+                );
+                setBooks(updatedBooks);
+                handleCloseDialog();
+              }}>Save</Button>
+            </DialogActions>
+          </Dialog>
+        )}
+        {imageToView && (
+          <Dialog open={Boolean(imageToView)} onClose={() => setImageToView('')}>
+            <img src={imageToView} alt="Full Screen" style={{ width: '100%' }} />
+          </Dialog>
+        )}
+      </div>
+    </ThemeProvider>
   );
 }
 
