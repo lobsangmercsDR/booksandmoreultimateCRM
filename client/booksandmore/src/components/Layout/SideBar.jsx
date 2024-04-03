@@ -47,8 +47,8 @@ function SideBar() {
       title: "Usuarios",
       icon: <PersonIcon />,
       subItems: [
-        { title: "Todos los Usuarios" },
-        { title: "Agregar usuario" },
+        { title: "Todos los Usuarios", path: "/allusers"},
+        { title: "Agregar usuario", path: "/adduser"},
       ]
     },
     {
