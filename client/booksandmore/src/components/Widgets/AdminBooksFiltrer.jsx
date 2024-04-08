@@ -23,7 +23,7 @@ const AdminBookFilters = ({
   const customStyles = {
     backgroundColor: theme.palette.mode === 'dark' ? theme.palette.background.default : theme.palette.background.paper,
     padding: theme.spacing(2),
-    borderRadius: theme.shape.borderRadius,
+
   };
 
 

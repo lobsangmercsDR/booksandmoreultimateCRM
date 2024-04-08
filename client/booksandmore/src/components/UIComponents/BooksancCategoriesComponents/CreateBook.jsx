@@ -76,6 +76,7 @@ const UploadBook = () => {
 
   return (
     <ThemeProvider theme={theme}>
+       <CategoryCreator />
       <Box
         sx={{
           '& .MuiTextField-root': { m: 1 },
@@ -226,7 +227,7 @@ const UploadBook = () => {
 
 
       </Box>
-      <CategoryCreator />
+
 
     </ThemeProvider>
 

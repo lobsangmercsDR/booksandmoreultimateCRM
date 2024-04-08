@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import {
   Box,
   Button,
@@ -9,6 +8,7 @@ import {
   Select,
   TextField,
 } from '@mui/material';
+import  { useState } from 'react';
 
 // Componente para crear un nuevo usuario
 const CreateUser = ({ addUser }) => {

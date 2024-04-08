@@ -55,7 +55,7 @@ function SideBar() {
       title: "Donaciones de libros",
       icon: <VolunteerActivismIcon />,
       subItems: [
-        { title: "Historial de donaciones" },
+        { title: "Donaciones", path: "/donations"},
         { title: "Donaciones pendientes" },
         { title: "Donaciones aceptadas" },
         { title: "Donaciones rechazadas" },
