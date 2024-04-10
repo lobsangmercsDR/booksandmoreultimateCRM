@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const idAutoIncrement = require('mongoose-id-autoincrement');
 const passport = require('passport');
 const cors = require('cors'); // Importar cors
+const errorMiddleware = require('./middleware/errorMiddleware');
 
 const app = express();
 
@@ -12,10 +13,18 @@ const app = express();
 app.use(bodyParser.json());
 
 // Middleware para CORS
-app.use(cors()); // Habilitar CORS para todas las rutas
+const corsOptions = {
+  origin: 'http://localhost:5173',
+  optionSuccessStatus: 200,
+
+};
+app.use(cors(corsOptions)); // Habilitar CORS para todas las rutas
 
 // Middleware para inicializar Passport
 app.use(passport.initialize());
+
+// Middleware para manejar errores
+app.use(errorMiddleware);
 
 // Construcción de la URI de conexión a MongoDB
 const MONGO_URI = `mongodb://${process.env.MONGO_INITDB_ROOT_USERNAME}:${process.env.MONGO_INITDB_ROOT_PASSWORD}@${process.env.MONGO_HOST}:${process.env.MONGO_PORT}/${process.env.MONGO_DB_NAME}?authSource=admin`;

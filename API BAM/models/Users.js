@@ -1,7 +1,15 @@
 const mongoose = require('mongoose');
+const { reset } = require('nodemon');
 const AutoIncrement = require('mongoose-sequence')(mongoose);
 
 const UserSchema = new mongoose.Schema({
+  resetPasswordToken: {
+    type: String,
+
+  },
+  resetPasswordExpires: {
+    type: Date,
+  },
     names: {
         type: String,
         required: true
@@ -39,7 +47,8 @@ const UserSchema = new mongoose.Schema({
     updated_at: {
         type: Date,
         default: Date.now
-    }
+  }
+
 });
 
 // Aplicar el plugin para autoincrementar el campo 'id'

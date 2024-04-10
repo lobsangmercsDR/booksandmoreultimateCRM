@@ -1,6 +1,13 @@
+const jwt = require('jsonwebtoken');
 const userService = require('../services/userServices');
+const { registerValidation, loginValidation } = require('../validations/userValidation');
 
 const registerUser = async (req, res) => {
+  const { error } = registerValidation(req.body);
+  if (error) {
+    return res.status(400).json({ error: error.details[0].message });
+  }
+
   try {
     const { names, lastnames, email, phone_number, delivery_address, password, role } = req.body;
     const result = await userService.createUser({ names, lastnames, email, phone_number, delivery_address, password, role });
@@ -9,13 +16,21 @@ const registerUser = async (req, res) => {
       return res.status(409).json({ error: result.error });
     }
 
-    return res.status(201).json(result);
+    // Generar un token JWT
+    const token = jwt.sign({ userId: result.userId }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+    return res.status(201).json({ token, userId: result.userId });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
 };
 
 const loginUser = async (req, res) => {
+  const { error } = loginValidation(req.body);
+  if (error) {
+    return res.status(400).json({ error: error.details[0].message });
+  }
+
   try {
     const { email, password } = req.body;
     const result = await userService.loginUser(email, password);
@@ -24,7 +39,10 @@ const loginUser = async (req, res) => {
       return res.status(401).json({ error: result.error });
     }
 
-    return res.status(200).json(result);
+    // Generar un token JWT
+    const token = jwt.sign({ userId: result.userId }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+    return res.status(200).json({ token, userId: result.userId });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }

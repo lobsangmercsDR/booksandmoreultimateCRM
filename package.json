@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "axios": "^1.6.8",
+    "joi": "^17.12.3",
+    "nodemailer": "^6.9.13",
+    "react-pageflip": "^2.0.3"
+  }
+}

@@ -7,8 +7,13 @@ const authMiddleware = require('../middleware/authMiddleware');
 router.post('/register', userController.registerUser);
 router.post('/login', userController.loginUser);
 
+// Función de middleware para aplicar authMiddleware solo a las rutas protegidas
+const protectedRoutes = (req, res, next) => {
+  authMiddleware(req, res, next);
+};
+
 // Rutas protegidas (requieren autenticación)
-router.use(authMiddleware);
+router.use(protectedRoutes);
 router.get('/', userController.getAllUsers);
 router.get('/:id', userController.getUserById);
 router.put('/:id', userController.updateUser);
