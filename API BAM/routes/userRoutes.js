@@ -6,17 +6,19 @@ const authMiddleware = require('../middleware/authMiddleware');
 // Rutas públicas (no requieren autenticación)
 router.post('/register', userController.registerUser);
 router.post('/login', userController.loginUser);
+router.get('/confirm/:token', userController.confirmEmail);
+router.post('/reset-password', userController.requestPasswordReset);
 
-// Función de middleware para aplicar authMiddleware solo a las rutas protegidas
-const protectedRoutes = (req, res, next) => {
-  authMiddleware(req, res, next);
-};
+// Corrección aquí
+// Asumiendo que tienes implementada la función resetPassword en userController
+router.post('/reset-password/:token', userController.resetPassword);
+
+// Ruta para restablecer la contraseña
 
 // Rutas protegidas (requieren autenticación)
-router.use(protectedRoutes);
-router.get('/', userController.getAllUsers);
-router.get('/:id', userController.getUserById);
-router.put('/:id', userController.updateUser);
-router.delete('/:id', userController.deleteUser);
+router.get('/', authMiddleware, userController.getAllUsers);
+router.get('/:id', authMiddleware, userController.getUserById);
+router.put('/:id', authMiddleware, userController.updateUser);
+router.delete('/:id', authMiddleware, userController.deleteUser);
 
 module.exports = router;
