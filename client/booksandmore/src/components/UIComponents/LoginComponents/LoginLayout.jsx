@@ -4,6 +4,7 @@ import Login from './LoginForm';
 import CreateAccount from './CreateAccount';
 import Cover from './BookCover';
 import './LoginLayout.css';
+import PasswordResetRequestForm from './PasswordReset';
 
 const LoginLayout = () => {
   const [page, setPage] = useState(0);
@@ -38,7 +39,7 @@ const LoginLayout = () => {
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-12">
           <HTMLFlipBook
             width={800} // Ajusta este valor según tus necesidades
-            height={500}
+            height={600}
             onFlip={handlePageChange}
             ref={flipBookRef}
             useMouseEvents={false}
@@ -65,7 +66,7 @@ const LoginLayout = () => {
               <CreateAccount />
             </div>
             <div className='page'>
-              Hola
+              <PasswordResetRequestForm />
 
             </div>
           </HTMLFlipBook>

@@ -5,6 +5,7 @@ const User = require('../models/Users');
 const e = require('express');
 const crypto = require('crypto');
 const sgMail = require('@sendgrid/mail');
+const bcrypt = require('bcryptjs');
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
@@ -133,7 +134,7 @@ const requestPasswordReset = async (req, res) => {
   user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
   await user.save();
 
-  const resetUrl = `http://localhost:3000/reset/${resetToken}`; // Corregido aquí
+  const resetUrl = `http://localhost:5173/reset/${resetToken}`; // Corregido aquí
   const message = {
     to: user.email,
     from: process.env.EMAIL_USER, // Asegúrate de que esta dirección de correo esté configurada en SendGrid
@@ -154,7 +155,8 @@ const requestPasswordReset = async (req, res) => {
 };
 
 const resetPassword = async (req, res) => {
-  const { token, newPassword } = req.body;
+  const { token } = req.params;
+  const { newPassword } = req.body;
   const user = await User.findOne({
     resetPasswordToken: token,
     resetPasswordExpires: { $gt: Date.now() },
@@ -169,6 +171,7 @@ const resetPassword = async (req, res) => {
   user.resetPasswordToken = undefined;
   user.resetPasswordExpires = undefined;
   await user.save();
+  User.updated_at = Date.now();
 
   res.json({ message: 'Password has been reset successfully' });
 };

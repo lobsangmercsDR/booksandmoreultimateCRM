@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 const CreateAccount = () => {
   const [formData, setFormData] = useState({
@@ -13,6 +14,8 @@ const CreateAccount = () => {
   });
   const [token, setToken] = useState(null);
   const [error, setError] = useState(null);
+  const [recaptchaToken, setRecaptchaToken] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -21,27 +24,31 @@ const CreateAccount = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!recaptchaToken) {
+      setError('Por favor, verifica que no eres un robot.');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
     try {
       const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
 
-      // Configura Axios con la URL base del backend
       const api = axios.create({
-        baseURL: 'http://localhost:3000', // Reemplaza con la URL de tu backend
+        baseURL: 'http://localhost:3000',
       });
 
-      // Enviar los datos del formulario al servidor para crear un nuevo usuario
       const response = await api.post('/api/users/register', formData, { headers });
-
-      // Manejar la respuesta del servidor
       if (response.data.token) {
         setToken(response.data.token);
+        setRecaptchaToken(null);
         console.log('Usuario registrado correctamente');
         // Aquí puedes redirigir al usuario a otra página o mostrar un mensaje de éxito
       } else {
         console.error('Error al registrar usuario:', response.data.error);
       }
 
-      // Limpiar el formulario después de enviar los datos
       setFormData({
         names: '',
         lastnames: '',
@@ -52,7 +59,6 @@ const CreateAccount = () => {
       });
     } catch (error) {
       if (error.response) {
-        // Manejar errores de autenticación
         if (error.response.status === 403) {
           if (error.response.data.error === 'Token expired') {
             setError('El token ha expirado. Por favor, inicia sesión nuevamente.');
@@ -63,11 +69,15 @@ const CreateAccount = () => {
           }
         } else if (error.response.status === 401) {
           setError('Acceso denegado. Por favor, verifica tus credenciales.');
+        } else if (error.response.status === 409) {
+          setError('El correo electrónico ya está en uso. Por favor, utiliza un correo electrónico diferente.');
         }
       } else {
         console.error('Error al registrar usuario:', error);
         setError('Ocurrió un error al registrar el usuario. Por favor, inténtalo de nuevo más tarde.');
       }
+    } finally {
+      setLoading(false);
     }
   };
   return (
@@ -174,6 +184,14 @@ const CreateAccount = () => {
             />
           </div>
         </div>
+        <ReCAPTCHA
+
+          sitekey="6LcBH7YpAAAAAOEKcSINavekiJuIECDlbYeQ-aAX" // Reemplaza con tu clave de sitio de reCAPTCHA
+          onChange={setRecaptchaToken}
+        />
+
+
+        {error && <div className="text-red-500">{error}</div>}
         <button
           type="submit"
           className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
