@@ -28,9 +28,22 @@ const LoginForm = () => {
 
       // Maneja la respuesta del servidor adecuadamente
       if (response.data.token) {
-        // Aquí puedes guardar el token en localStorage o en el estado global
-        console.log('Inicio de sesión exitoso');
-        // También puedes redirigir al usuario o realizar otras acciones necesarias
+        const { token, role } = response.data;
+        // Establece una cookie segura con el token
+        document.cookie = `token=${token}; Secure; HttpOnly; SameSite=Strict; Path=/;`;
+
+        // Establece una cookie segura con el rol
+        document.cookie = `role=${role}; Secure; HttpOnly; SameSite=Strict; Path=/;`;
+
+
+
+        if (role === 'admin') {
+          // Redirige al panel de administrador
+          window.location.href = '/dashboard';
+        } else {
+          console.log('Usuario autenticado');
+        }
+
         setIsLoading(false); // Indica que la solicitud ha finalizado
       }
     } catch (error) {

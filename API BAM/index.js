@@ -6,8 +6,13 @@ const idAutoIncrement = require('mongoose-id-autoincrement');
 const passport = require('passport');
 const cors = require('cors'); // Importar cors
 const errorMiddleware = require('./middleware/errorMiddleware');
-
+const cookieParser = require('cookie-parser');
+const decryptCookies = require('./controllers/descryptCookies')
 const app = express();
+
+// Middleware para cookies
+app.use(cookieParser());
+app.use(decryptCookies);
 
 // Middleware para parsear el cuerpo de las peticiones JSON
 app.use(bodyParser.json());

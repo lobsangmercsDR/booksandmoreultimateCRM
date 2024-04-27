@@ -7,8 +7,25 @@ const crypto = require('crypto');
 const sgMail = require('@sendgrid/mail');
 const bcrypt = require('bcryptjs');
 
+const algorithm = 'aes-256-gcm';
+const encryptionKey = crypto.randomBytes(32);
+
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
+const encryptCookie = (value) => {
+  const iv = crypto.randomBytes(16); // Vector de inicialización
+  const cipher = crypto.createCipheriv(algorithm, encryptionKey, iv);
+  const encrypted = Buffer.concat([iv, cipher.update(value, 'utf8'), cipher.final()]);
+  return encrypted.toString('base64');
+};
+
+const decryptCookie = (encrypted) => {
+  const buffer = Buffer.from(encrypted, 'base64');
+  const iv = buffer.slice(0, 16);
+  const data = buffer.slice(16);
+  const decipher = crypto.createDecipheriv(algorithm, encryptionKey, iv);
+  return decipher.update(data).toString() + decipher.final().toString();
+};
 
 const registerUser = async (req, res) => {
   const { error } = registerValidation(req.body);
@@ -35,11 +52,6 @@ const registerUser = async (req, res) => {
 };
 
 const loginUser = async (req, res) => {
-  const { error } = loginValidation(req.body);
-  if (error) {
-    return res.status(400).json({ error: error.details[0].message });
-  }
-
   try {
     const { email, password } = req.body;
     const result = await userService.loginUser(email, password);
@@ -51,11 +63,19 @@ const loginUser = async (req, res) => {
     // Generar un token JWT
     const token = jwt.sign({ userId: result.userId }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-    return res.status(200).json({ token, userId: result.userId });
+    // Encriptar y establecer las cookies
+    const encryptedToken = encryptCookie(token);
+    const encryptedRole = encryptCookie(result.role);
+
+    res.cookie('token', encryptedToken, { httpOnly: true, sameSite: 'strict', path: '/' });
+    res.cookie('role', encryptedRole, { httpOnly: true, sameSite: 'strict', path: '/' });
+
+    return res.status(200).json({ token, userId: result.userId, role: result.role });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
 };
+
 const confirmEmail = async (req, res) => {
   try {
     const user = await User.findOne({
@@ -122,6 +142,7 @@ const deleteUser = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 };
+
 const requestPasswordReset = async (req, res) => {
   const { email } = req.body;
   const user = await User.findOne({ email });
@@ -175,7 +196,6 @@ const resetPassword = async (req, res) => {
 
   res.json({ message: 'Password has been reset successfully' });
 };
-;
 
 module.exports = {
   registerUser,
@@ -187,4 +207,6 @@ module.exports = {
   confirmEmail,
   resetPassword,
   requestPasswordReset,
+  encryptCookie,
+  decryptCookie,
 };
