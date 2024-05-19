@@ -4,10 +4,10 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const idAutoIncrement = require('mongoose-id-autoincrement');
 const passport = require('passport');
-const cors = require('cors'); // Importar cors
+const cors = require('cors');
 const errorMiddleware = require('./middleware/errorMiddleware');
 const cookieParser = require('cookie-parser');
-const decryptCookies = require('./controllers/descryptCookies')
+const decryptCookies = require('./controllers/descryptCookies');
 const app = express();
 
 // Middleware para cookies
@@ -20,10 +20,10 @@ app.use(bodyParser.json());
 // Middleware para CORS
 const corsOptions = {
   origin: 'http://localhost:5173',
+  credentials: true,
   optionSuccessStatus: 200,
-
 };
-app.use(cors(corsOptions)); // Habilitar CORS para todas las rutas
+app.use(cors(corsOptions));
 
 // Middleware para inicializar Passport
 app.use(passport.initialize());
@@ -42,7 +42,6 @@ mongoose
   })
   .then(() => {
     console.log('MongoDB Connected');
-    // Inicializar el plugin de autoincremento después de que la conexión sea exitosa
     idAutoIncrement.initialize(mongoose.connection);
   })
   .catch((err) => console.log('MongoDB connection error:', err));
@@ -51,7 +50,7 @@ mongoose
 const userRoutes = require('./routes/userRoutes');
 
 // Usa las rutas importadas
-app.use('/api/users', userRoutes); // Prefijo las rutas con '/api/users'
+app.use('/api/users', userRoutes);
 
 // Ruta de prueba
 app.get('/', (req, res) => {

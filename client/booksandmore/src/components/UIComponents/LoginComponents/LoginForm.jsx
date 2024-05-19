@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import axios from 'axios';
+import { decodeToken } from 'react-jwt';
 
 const LoginForm = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
-  const [error, setError] = useState(null); // Estado para manejar errores
-  const [isLoading, setIsLoading] = useState(false); // Estado para indicar que se está cargando
+  const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -15,47 +16,48 @@ const LoginForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true); // Indicar que la solicitud está en proceso
-    setError(null); // Limpiar errores anteriores
+    setIsLoading(true);
+    setError(null);
 
     const api = axios.create({
-      baseURL: 'http://localhost:3000', // Asegúrate de reemplazar con la URL de tu backend
+      baseURL: 'http://localhost:3000',
     });
 
     try {
-      // Intenta iniciar sesión con los datos del formulario
       const response = await api.post('/api/users/login', formData);
 
-      // Maneja la respuesta del servidor adecuadamente
       if (response.data.token) {
-        const { token, role } = response.data;
-        // Establece una cookie segura con el token
-        document.cookie = `token=${token}; Secure; HttpOnly; SameSite=Strict; Path=/;`;
+        const { token, userId, role } = response.data;
+        localStorage.setItem('token', token);
+        localStorage.setItem('userId', userId);
+        localStorage.setItem('role', role);
 
-        // Establece una cookie segura con el rol
-        document.cookie = `role=${role}; Secure; HttpOnly; SameSite=Strict; Path=/;`;
-
-
+        const decodedToken = decodeToken(token);
+        console.log('Decoded Token:', decodedToken);
 
         if (role === 'admin') {
-          // Redirige al panel de administrador
-          window.location.href = '/dashboard';
+          setTimeout(() => {
+            window.location.href = '/dashboard';
+          }, 1000); // Retraso de 1 segundo (ajusta según sea necesario)
         } else {
           console.log('Usuario autenticado');
         }
 
-        setIsLoading(false); // Indica que la solicitud ha finalizado
+        setIsLoading(false);
       }
     } catch (error) {
+      console.error('Error durante el inicio de sesión:', error);
       if (error.response) {
-        // Aquí puedes manejar errores específicos del servidor, como credenciales inválidas
+        console.error('Error de respuesta del servidor:', error.response.data);
         setError('Error al iniciar sesión: ' + error.response.data.message);
       } else {
+        console.error('Error de red:', error.message);
         setError('Ocurrió un error al intentar iniciar sesión. Por favor, inténtalo de nuevo más tarde.');
       }
-      setIsLoading(false); // Indica que la solicitud ha finalizado
+      setIsLoading(false);
     }
   };
+
 
   return (
     <div className="flex flex-col items-center justify-center h-full p-8">

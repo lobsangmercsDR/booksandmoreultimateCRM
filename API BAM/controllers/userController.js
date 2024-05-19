@@ -60,21 +60,17 @@ const loginUser = async (req, res) => {
       return res.status(401).json({ error: result.error });
     }
 
-    // Generar un token JWT
-    const token = jwt.sign({ userId: result.userId }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ userId: result.userId, role: result.role }, process.env.JWT_SECRET, {
+      expiresIn: '1h',
+    });
 
-    // Encriptar y establecer las cookies
-    const encryptedToken = encryptCookie(token);
-    const encryptedRole = encryptCookie(result.role);
-
-    res.cookie('token', encryptedToken, { httpOnly: true, sameSite: 'strict', path: '/' });
-    res.cookie('role', encryptedRole, { httpOnly: true, sameSite: 'strict', path: '/' });
-
-    return res.status(200).json({ token, userId: result.userId, role: result.role });
+    res.cookie('token', token, { httpOnly: true, secure: true, sameSite: 'Strict' });
+    return res.status(200).json({token, userId: result.userId, role: result.role });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
 };
+
 
 const confirmEmail = async (req, res) => {
   try {
@@ -107,9 +103,29 @@ const getAllUsers = async (req, res) => {
   }
 };
 
+const updateUser = async (req, res) => {
+  const { names, lastnames, email, phone_number, delivery_address, role } = req.body;
+
+  // Validación básica
+  if (!names || !lastnames || !email || !phone_number || !delivery_address || !role) {
+    return res.status(400).json({ error: 'All fields are required' });
+  }
+
+  try {
+    const updatedUser = await User.findOneAndUpdate({ id: req.params.id }, req.body, { new: true });
+    if (!updatedUser) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    return res.status(200).json(updatedUser);
+  } catch (error) {
+    console.error('Error updating user:', error);
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
 const getUserById = async (req, res) => {
   try {
-    const user = await userService.getUserById(req.params.id);
+    const user = await User.findOne({ id: req.params.id });
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
@@ -119,21 +135,9 @@ const getUserById = async (req, res) => {
   }
 };
 
-const updateUser = async (req, res) => {
-  try {
-    const updatedUser = await userService.updateUser(req.params.id, req.body);
-    if (!updatedUser) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-    return res.status(200).json(updatedUser);
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
-  }
-};
-
 const deleteUser = async (req, res) => {
   try {
-    const deletedUser = await userService.deleteUser(req.params.id);
+    const deletedUser = await User.findOneAndDelete({ id: req.params.id });
     if (!deletedUser) {
       return res.status(404).json({ error: 'User not found' });
     }
@@ -142,6 +146,8 @@ const deleteUser = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 };
+
+
 
 const requestPasswordReset = async (req, res) => {
   const { email } = req.body;
