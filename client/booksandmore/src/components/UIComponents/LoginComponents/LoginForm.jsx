@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { decodeToken } from 'react-jwt';
 
@@ -9,6 +9,23 @@ const LoginForm = () => {
   });
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [csrfToken, setCsrfToken] = useState('');
+
+  // Obtener el token CSRF al cargar el componente
+  useEffect(() => {
+    const getCsrfToken = async () => {
+      try {
+        const response = await axios.get('http://localhost:3000/csrf-token', {
+          withCredentials: true,
+        });
+        setCsrfToken(response.data.csrfToken);
+      } catch (error) {
+        console.error('Error al obtener el token CSRF:', error);
+      }
+    };
+
+    getCsrfToken();
+  }, []);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -21,6 +38,10 @@ const LoginForm = () => {
 
     const api = axios.create({
       baseURL: 'http://localhost:3000',
+      withCredentials: true, // Incluir cookies en la solicitud
+      headers: {
+        'X-CSRF-Token': csrfToken, // Incluir el token CSRF en las cabeceras
+      },
     });
 
     try {
@@ -57,7 +78,6 @@ const LoginForm = () => {
       setIsLoading(false);
     }
   };
-
 
   return (
     <div className="flex flex-col items-center justify-center h-full p-8">

@@ -60,6 +60,7 @@ const AllUsers = () => {
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [confirmAction, setConfirmAction] = useState(null);
+  const [csrfToken, setCsrfToken] = useState('');
 
   useEffect(() => {
     console.log('Token:', token);
@@ -71,12 +72,28 @@ const AllUsers = () => {
     }
   }, [token, isExpired, isAdmin, navigate, decodedToken]);
 
+  const fetchCsrfToken = async () => {
+    try {
+      const response = await axios.get('http://localhost:3000/csrf-token', {
+        withCredentials: true,
+      });
+      setCsrfToken(response.data.csrfToken);
+    } catch (error) {
+      console.error('Error fetching CSRF token:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCsrfToken();
+  }, []);
+
   const fetchUsers = async () => {
     try {
       const response = await axios.get('http://localhost:3000/api/users', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
+        withCredentials: true,
       });
 
       console.log('Response:', response.data);
@@ -147,12 +164,23 @@ const AllUsers = () => {
     setSelectedUser((prevUser) => ({ ...prevUser, [field]: value }));
   };
 
+  const handleConfirmAction = async () => {
+    if (confirmAction === 'delete') {
+      await deleteUser(selectedUser.id);
+    } else if (confirmAction === 'edit') {
+      await saveUser();
+    }
+    handleCloseConfirmDialog();
+  };
+
   const saveUser = async () => {
     try {
       const response = await axios.put(`http://localhost:3000/api/users/${selectedUser.id}`, selectedUser, {
         headers: {
           Authorization: `Bearer ${token}`,
+          'X-CSRF-Token': csrfToken,
         },
+        withCredentials: true,
       });
 
       const updatedUser = response.data;
@@ -167,27 +195,20 @@ const AllUsers = () => {
     }
   };
 
-  const deleteUser = async () => {
+  const deleteUser = async (userId) => {
     try {
-      await axios.delete(`http://localhost:3000/api/users/${selectedUser.id}`, {
+      await axios.delete(`http://localhost:3000/api/users/${userId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
+          'X-CSRF-Token': csrfToken,
         },
+        withCredentials: true,
       });
-      const updatedUsers = users.filter((user) => user.id !== selectedUser.id);
+      const updatedUsers = users.filter((user) => user.id !== userId);
       setUsers(updatedUsers);
       setFilteredUsers(updatedUsers);
-      handleCloseConfirmDialog();
     } catch (error) {
       console.error('Error deleting user:', error);
-    }
-  };
-
-  const handleConfirmAction = () => {
-    if (confirmAction === 'edit') {
-      saveUser();
-    } else if (confirmAction === 'delete') {
-      deleteUser();
     }
   };
 
@@ -195,14 +216,12 @@ const AllUsers = () => {
     <ThemeProvider theme={theme}>
       <Box>
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-          <Typography variant="h6">User Management</Typography>
           <TextField
-            variant="outlined"
-            placeholder="Search users"
+            label="Search"
             value={searchQuery}
             onChange={handleSearchChange}
             InputProps={{
-              startAdornment: <SearchIcon position="start" />,
+              endAdornment: <SearchIcon />,
             }}
           />
         </Box>
@@ -311,7 +330,7 @@ const AllUsers = () => {
           </DialogContent>
           <DialogActions>
             <Button onClick={handleCloseDialog}>Cancel</Button>
-            <Button onClick={handleConfirmAction}>Save</Button>
+            <Button onClick={handleOpenConfirmDialog}>Save</Button>
           </DialogActions>
         </Dialog>
 
