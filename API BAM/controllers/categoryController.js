@@ -112,7 +112,8 @@ const addSubcategory = async (req, res) => {
     }
     category.subcategories.push({ name });
     await category.save();
-    res.status(201).json(category);
+    const subcategory = category.subcategories[category.subcategories.length - 1];
+    res.status(201).json(subcategory);
   } catch (error) {
     if (error.code === 11000) {
       res.status(409).json({ error: 'Subcategory name already exists' });
@@ -138,13 +139,13 @@ const updateSubcategory = async (req, res) => {
     if (!category) {
       return res.status(404).json({ error: 'Category not found' });
     }
-    const subcategory = category.subcategories.id(subcategoryId);
+    const subcategory = category.subcategories.find(sub => sub.subcategoryId === parseInt(subcategoryId));
     if (!subcategory) {
       return res.status(404).json({ error: 'Subcategory not found' });
     }
     subcategory.name = name;
     await category.save();
-    res.status(200).json(category);
+    res.status(200).json(subcategory);
   } catch (error) {
     if (error.code === 11000) {
       res.status(409).json({ error: 'Subcategory name already exists' });
@@ -166,11 +167,11 @@ const deleteSubcategory = async (req, res) => {
     if (!category) {
       return res.status(404).json({ error: 'Category not found' });
     }
-    const subcategory = category.subcategories.id(subcategoryId);
+    const subcategory = category.subcategories.find(sub => sub.subcategoryId === parseInt(subcategoryId));
     if (!subcategory) {
       return res.status(404).json({ error: 'Subcategory not found' });
     }
-    subcategory.remove();
+    category.subcategories.id(subcategory._id).remove();
     await category.save();
     res.status(204).end();
   } catch (error) {

@@ -89,10 +89,12 @@ app.use('/api/', apiLimiter);
 // Importar rutas después de configurar el middleware
 const userRoutes = require('./routes/userRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
+const bookRoutes = require('./routes/booksRoutes');
 
 // Usa las rutas importadas
 app.use('/api/users', userRoutes);
 app.use('/api/categories', categoryRoutes);
+app.use('/api/books', bookRoutes);
 
 // Ruta para obtener el token CSRF
 app.get('/csrf-token', (req, res) => {

@@ -7,6 +7,10 @@ const SubcategorySchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
+  subcategoryId: {
+    type: Number,
+    unique: true,
+  },
 });
 
 const CategorySchema = new mongoose.Schema({
@@ -15,10 +19,7 @@ const CategorySchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
-  subcategories: {
-    type: [SubcategorySchema],
-    default: [],
-  },
+  subcategories: [SubcategorySchema],
   createdAt: {
     type: Date,
     default: Date.now,
@@ -30,6 +31,7 @@ const CategorySchema = new mongoose.Schema({
 });
 
 CategorySchema.plugin(AutoIncrement, { inc_field: 'categoryId' });
+SubcategorySchema.plugin(AutoIncrement, { inc_field: 'subcategoryId' });
 
 const Category = mongoose.model('Category', CategorySchema);
 
